@@ -1,10 +1,15 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+
 import Navbar from "@/components/navbar";
+import PriceTicker from "@/components/price-ticker";
+
 import {
   getProduct,
+  getProducts,
 } from "@/lib/api";
+
 import {
   formatTaka,
   getUnitLabel,
@@ -17,79 +22,158 @@ export default async function ProductDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await getProduct(id);
+
+  const [product, allProducts] = await Promise.all([
+    getProduct(id),
+    getProducts(),
+  ]);
 
   if (!product) {
     notFound();
   }
 
+  const markets = product.markets;
+
+  const minPrice =
+    markets.length > 0
+      ? Math.min(...markets.map((market) => market.min))
+      : product.today;
+
+  const maxPrice =
+    markets.length > 0
+      ? Math.max(...markets.map((market) => market.max))
+      : product.today;
+
+  const avgPrice =
+    markets.length > 0
+      ? markets.reduce(
+          (total, market) =>
+            total + (market.min + market.max) / 2,
+          0
+        ) / markets.length
+      : product.today;
+
+  const cheapestMarket = markets.reduce<
+    (typeof markets)[number] | null
+  >(
+    (cheapest, market) =>
+      !cheapest || market.min < cheapest.min
+        ? market
+        : cheapest,
+    null
+  );
+
+  const expensiveMarket = markets.reduce<
+    (typeof markets)[number] | null
+  >(
+    (expensive, market) =>
+      !expensive || market.max > expensive.max
+        ? market
+        : expensive,
+    null
+  );
+
+  const changeText =
+    product.change.dir === "up"
+      ? "বেড়েছে"
+      : product.change.dir === "down"
+        ? "কমেছে"
+        : "অপরিবর্তিত";
+
   return (
-    <main className="min-h-screen bg-[#fafaf7]">
+    <main className="min-h-screen bg-[#fafaf7] text-stone-900">
       <Navbar />
 
-      <section className="mx-auto max-w-6xl px-4 py-10">
-        <nav className="mb-8 text-sm text-stone-500">
+      <PriceTicker products={allProducts} />
+
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+        {/* Breadcrumb */}
+        <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link href="/" className="hover:text-emerald-700">
             হোম
           </Link>
-          <span className="mx-2">/</span>
+
+          <span>/</span>
+
           <Link
             href={`/category/${product.category}`}
             className="hover:text-emerald-700"
           >
             {product.categoryNameBn}
           </Link>
-          <span className="mx-2">/</span>
-          <span className="text-stone-900">{product.nameBn}</span>
+
+          <span>/</span>
+
+          <span className="font-medium text-stone-900">
+            {product.nameBn}
+          </span>
         </nav>
 
-        <div className="grid gap-8 rounded-3xl border border-stone-200 bg-white p-5 sm:p-8 md:grid-cols-2">
-          <div className="flex min-h-72 items-center justify-center rounded-2xl bg-stone-50 p-6">
-            
-            {product.image &&
-typeof product.image === "string" &&
-product.image.startsWith("https://") ? (
-  <Image
-    src={product.image}
-    alt={product.nameBn}
-    width={400}
-    height={400}
-    unoptimized
-    className="max-h-80 w-full object-contain"
-  />
-) : (
-  <span className="text-8xl">
-    {product.categoryIcon || "🛒"}
-  </span>
-)}
-          </div>
-
+        {/* Product heading and today's price */}
+        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="flex flex-col justify-center">
-            <p className="text-sm font-semibold text-emerald-700">
-              {product.categoryNameBn}
-            </p>
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex size-12 items-center justify-center rounded-2xl bg-emerald-50 text-3xl">
+                {product.categoryIcon || "🛒"}
+              </span>
 
-            <h1 className="mt-3 text-3xl font-extrabold text-stone-900 sm:text-4xl">
+              <span className="font-semibold text-emerald-800">
+                {product.categoryNameBn}
+              </span>
+            </div>
+
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
               {product.nameBn}
             </h1>
 
             <p className="mt-3 text-stone-500">
-              {getUnitLabel(product.unit)}
+              {getUnitLabel(product.unit)} · {product.categoryNameBn}
             </p>
 
-            <p className="mt-6 text-3xl font-extrabold text-emerald-800">
-              {formatTaka(product.today)}
-            </p>
-
-            <p className="mt-2 text-sm text-stone-600">
-              গতকালের তুলনায়{" "}
+            <p className="mt-6 text-sm text-stone-600">
+              গতকালের তুলনায় আজ দাম{" "}
               <span
                 className={
                   product.change.dir === "up"
-                    ? "font-semibold text-red-600"
+                    ? "font-bold text-red-600"
                     : product.change.dir === "down"
-                      ? "font-semibold text-emerald-700"
-                      : "font-semibold text-stone-600"
+                      ? "font-bold text-emerald-700"
+                      : "font-bold text-stone-600"
+                }
+              >
+                {changeText}{" "}
+                {new Intl.NumberFormat("bn-BD", {
+                  maximumFractionDigits: 1,
+                }).format(product.change.pct)}%
+              </span>
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8">
+            <p className="text-sm font-medium text-stone-500">
+              আজকের দাম
+            </p>
+
+            <div className="mt-3 flex flex-wrap items-baseline gap-3">
+              <span className="text-4xl font-extrabold text-emerald-800 sm:text-5xl">
+                {new Intl.NumberFormat("bn-BD", {
+                  maximumFractionDigits: 2,
+                }).format(product.today)}
+              </span>
+
+              <span className="text-base text-stone-500">
+                টাকা / {product.unit}
+              </span>
+            </div>
+
+            <div className="mt-5 inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3">
+              <span
+                className={
+                  product.change.dir === "up"
+                    ? "font-bold text-red-600"
+                    : product.change.dir === "down"
+                      ? "font-bold text-emerald-700"
+                      : "font-bold text-stone-600"
                 }
               >
                 {getChangeLabel(
@@ -97,100 +181,208 @@ product.image.startsWith("https://") ? (
                   product.change.pct
                 )}
               </span>
-            </p>
 
-            <div className="mt-8 border-t border-stone-200 pt-6">
-              <h2 className="text-lg font-bold text-stone-900">
-                দামের তুলনা
-              </h2>
-
-              <div className="mt-4 space-y-3">
-                <div className="flex items-center justify-between rounded-xl bg-stone-50 p-4">
-                  <span className="text-stone-600">আজকের দাম</span>
-                  <span className="font-bold text-stone-900">
-                    {formatTaka(product.today)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-stone-50 p-4">
-                  <span className="text-stone-600">গতকালের দাম</span>
-                  <span className="font-semibold text-stone-800">
-                    {formatTaka(product.yesterday)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-stone-50 p-4">
-                  <span className="text-stone-600">গত সপ্তাহের দাম</span>
-                  <span className="font-semibold text-stone-800">
-                    {formatTaka(product.lastWeek)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-stone-50 p-4">
-                  <span className="text-stone-600">গত মাসের দাম</span>
-                  <span className="font-semibold text-stone-800">
-                    {formatTaka(product.lastMonth)}
-                  </span>
-                </div>
-              </div>
+              <span className="text-sm text-stone-600">
+                গতকালের তুলনায়
+              </span>
             </div>
           </div>
-        </div>
+        </section>
 
-        <section className="mt-8 rounded-3xl border border-stone-200 bg-white p-5 sm:p-8">
-          <h2 className="text-xl font-bold text-stone-900">
-            বিভিন্ন বাজারে দাম
+        {/* Market price summary */}
+        <section className="mt-8">
+          <h2 className="mb-4 text-xl font-bold">
+            দামের সারসংক্ষেপ
           </h2>
 
-          {product.markets.length > 0 ? (
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[420px] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-stone-500">
-                    <th className="px-3 py-3">বাজার</th>
-                    <th className="px-3 py-3">বিভাগ</th>
-                    <th className="px-3 py-3">সর্বনিম্ন দাম</th>
-                    <th className="px-3 py-3">সর্বোচ্চ দাম</th>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                সর্বনিম্ন দাম
+              </p>
+
+              <p className="mt-2 text-2xl font-extrabold text-emerald-800">
+                {formatTaka(minPrice)}
+              </p>
+
+              <p className="mt-2 text-sm text-stone-500">
+                {cheapestMarket
+                  ? `সবচেয়ে কম দামের বাজার: ${cheapestMarket.market}`
+                  : "বাজারের তথ্য নেই"}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                সর্বাধিক দাম
+              </p>
+
+              <p className="mt-2 text-2xl font-extrabold text-red-700">
+                {formatTaka(maxPrice)}
+              </p>
+
+              <p className="mt-2 text-sm text-stone-500">
+                {expensiveMarket
+                  ? `সবচেয়ে বেশি দামের বাজার: ${expensiveMarket.market}`
+                  : "বাজারের তথ্য নেই"}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                গড় দাম
+              </p>
+
+              <p className="mt-2 text-2xl font-extrabold text-stone-900">
+                {formatTaka(avgPrice)}
+              </p>
+
+              <p className="mt-2 text-sm text-stone-500">
+                {getUnitLabel(product.unit)}-এর হিসাবে
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Market-by-market prices */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold">
+            বাজারভিত্তিক আজকের দাম
+          </h2>
+
+          {markets.length > 0 ? (
+            <div className="mt-4 overflow-x-auto rounded-2xl border border-stone-200 bg-white">
+              <table className="w-full min-w-[620px] text-left text-sm">
+                <thead className="bg-stone-50">
+                  <tr className="border-b border-stone-200 text-stone-600">
+                    <th className="px-4 py-4 font-semibold">
+                      বাজার
+                    </th>
+
+                    <th className="px-4 py-4 font-semibold">
+                      বিভাগ
+                    </th>
+
+                    <th className="px-4 py-4 text-right font-semibold">
+                      সর্বনিম্ন
+                    </th>
+
+                    <th className="px-4 py-4 text-right font-semibold">
+                      সর্বাধিক
+                    </th>
+
+                    <th className="px-4 py-4 text-right font-semibold">
+                      গড়
+                    </th>
                   </tr>
                 </thead>
 
                 <tbody>
-                  {product.markets.map((market, index) => (
-                    <tr
-                      key={`${market.market}-${index}`}
-                      className="border-b border-stone-100 last:border-0"
-                    >
-                      <td className="px-3 py-4 font-medium text-stone-900">
-                        {market.market}
-                      </td>
-                      <td className="px-3 py-4 text-stone-600">
-                        {market.division}
-                      </td>
-                      <td className="px-3 py-4 text-emerald-700">
-                        {formatTaka(market.min)}
-                      </td>
-                      <td className="px-3 py-4 text-stone-700">
-                        {formatTaka(market.max)}
-                      </td>
-                    </tr>
-                  ))}
+                  {markets.map((market, index) => {
+                    const marketAverage =
+                      (market.min + market.max) / 2;
+
+                    return (
+                      <tr
+                        key={`${market.market}-${index}`}
+                        className="border-b border-stone-100 last:border-0 hover:bg-stone-50"
+                      >
+                        <td className="px-4 py-4 font-semibold text-stone-900">
+                          {market.market}
+                        </td>
+
+                        <td className="px-4 py-4 text-stone-600">
+                          {market.division}
+                        </td>
+
+                        <td className="px-4 py-4 text-right text-emerald-700">
+                          {formatTaka(market.min)}
+                        </td>
+
+                        <td className="px-4 py-4 text-right text-stone-700">
+                          {formatTaka(market.max)}
+                        </td>
+
+                        <td className="px-4 py-4 text-right font-semibold text-stone-900">
+                          {formatTaka(marketAverage)}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="mt-4 text-sm text-stone-500">
+            <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-8 text-center text-stone-500">
               এই পণ্যের বাজারভিত্তিক তথ্য পাওয়া যায়নি।
-            </p>
+            </div>
           )}
         </section>
 
-        <Link
-          href="/"
-          className="mt-8 inline-flex rounded-xl bg-emerald-800 px-5 py-3 font-semibold text-white transition hover:bg-emerald-900"
-        >
-          ← সব পণ্যে ফিরে যান
-        </Link>
-      </section>
+        {/* Historical prices */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold">
+            আগের দামের তথ্য
+          </h2>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                গতকালের দাম
+              </p>
+
+              <p className="mt-2 text-xl font-bold">
+                {formatTaka(product.yesterday)}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                গত সপ্তাহের দাম
+              </p>
+
+              <p className="mt-2 text-xl font-bold">
+                {formatTaka(product.lastWeek)}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-stone-200 bg-white p-5">
+              <p className="text-sm text-stone-500">
+                গত মাসের দাম
+              </p>
+
+              <p className="mt-2 text-xl font-bold">
+                {formatTaka(product.lastMonth)}
+              </p>
+            </div>
+          </div>
+        </section>
+
+<Link
+  href={`/category/${product.category}`}
+  className="mt-8 inline-flex rounded-xl bg-emerald-800 px-5 py-3 font-semibold text-white transition hover:bg-emerald-900"
+>
+  ← সব {product.categoryNameBn} দেখুন
+</Link>
+
+      </div>
+
+      {/* Footer */}
+      <footer className="mt-12 border-t border-stone-200 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-8 text-center">
+          <p className="font-bold text-emerald-800">
+            বাজার দর
+          </p>
+
+          <p className="mt-2 text-sm text-stone-600">
+            প্রয়োজনীয় পণ্যের দাম এক নজরে।
+          </p>
+
+          <p className="mt-3 text-xs text-stone-500">
+            সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।
+          </p>
+        </div>
+      </footer>
     </main>
   );
 }
