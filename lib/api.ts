@@ -1,6 +1,6 @@
 import type { Category, Product } from "./types";
 
-const API_BASE = "https://api.abcz.workers.dev/api/bazardor";
+const API_BASE = "https://openapi.programming-hero.com/api/bazardor";
 
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url, {
