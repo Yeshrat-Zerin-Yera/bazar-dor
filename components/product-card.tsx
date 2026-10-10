@@ -14,6 +14,13 @@ export default function ProductCard({
         ? "text-red-700 bg-red-50"
         : "text-gray-600 bg-gray-100";
 
+  const changeLabel =
+    product.change.dir === "up"
+      ? `▲ ${getChangeLabel(product.change.dir, product.change.pct).replace(/^[▲▼↑↓]\s*/, "")}`
+      : product.change.dir === "down"
+        ? `▼ ${getChangeLabel(product.change.dir, product.change.pct).replace(/^[▲▼↑↓]\s*/, "")}`
+        : getChangeLabel(product.change.dir, product.change.pct);
+
   return (
     <Link
       href={`/product/${product.slug}`}
@@ -27,7 +34,7 @@ export default function ProductCard({
         <span
           className={`rounded-full px-2.5 py-1 text-xs font-semibold ${changeColor}`}
         >
-          {getChangeLabel(product.change.dir, product.change.pct)}
+          {changeLabel}
         </span>
       </div>
 
