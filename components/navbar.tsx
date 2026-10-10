@@ -15,7 +15,7 @@ const categories = [
   { slug: "mach", name: "মাছ", icon: "🐟" },
   { slug: "mangsho", name: "মাংস", icon: "🍗" },
   { slug: "dim-dui", name: "ডিম-দুধ", icon: "🥛" },
-  { slug: "moshla", name: "মসলা", icon: "🌶️" },
+  { slug: "mosla", name: "মসলা", icon: "🌶️" },
 ];
 
 export default function Navbar() {
