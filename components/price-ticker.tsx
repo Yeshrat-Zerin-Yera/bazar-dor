@@ -39,9 +39,9 @@ export default function PriceTicker({
               }
             >
               {product.change.dir === "up"
-                ? "▼"
+                ? "▲"
                 : product.change.dir === "down"
-                  ? "▲"
+                  ? "▼"
                   : "—"}{" "}
               {new Intl.NumberFormat("bn-BD", {
                 maximumFractionDigits: 1,
