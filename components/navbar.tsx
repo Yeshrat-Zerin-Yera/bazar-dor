@@ -57,26 +57,36 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-5">
-        <Link href="/" className="flex items-center gap-3">
-          <Image
-            src="/logo-icon.png"
-            alt="বাজার দর লোগো"
-            width={48}
-            height={48}
-            className="size-12 rounded-xl object-contain"
-          />
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:py-5">
+        {/* Logo and website name */}
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-3"
+          aria-label="বাজার দর হোম পেজ"
+        >
+          <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-800 p-1.5">
+            <Image
+              src="/logo-icon.png"
+              alt="বাজার দর লোগো"
+              width={48}
+              height={48}
+              className="h-full w-full object-contain"
+              priority
+            />
+          </span>
 
-          <span>
-            <span className="block text-2xl font-extrabold text-emerald-900">
+          <span className="min-w-0">
+            <span className="block whitespace-nowrap text-2xl font-extrabold text-emerald-900">
               বাজার দর
             </span>
-            <span className="mt-1 block text-xs text-stone-500">
+
+            <span className="mt-1 block whitespace-nowrap text-xs text-stone-500">
               {banglaDate}
             </span>
           </span>
         </Link>
 
+        {/* Authentication and profile */}
         <div className="flex items-center gap-2 text-sm font-semibold">
           {isPending ? (
             <div className="h-10 w-24 animate-pulse rounded-full bg-stone-100" />
@@ -107,7 +117,7 @@ export default function Navbar() {
 
                 <ChevronDown
                   size={16}
-                  className={`text-stone-500 transition-transform ${
+                  className={`shrink-0 text-stone-500 transition-transform ${
                     profileOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -127,6 +137,7 @@ export default function Navbar() {
                       <p className="truncate font-semibold text-stone-900">
                         {session.user.name || "ব্যবহারকারী"}
                       </p>
+
                       <p className="mt-1 truncate text-sm font-normal text-stone-500">
                         {session.user.email}
                       </p>
@@ -149,7 +160,9 @@ export default function Navbar() {
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <LogOut size={19} />
-                        {signingOut ? "সাইন আউট হচ্ছে..." : "সাইন আউট"}
+                        {signingOut
+                          ? "সাইন আউট হচ্ছে..."
+                          : "সাইন আউট"}
                       </button>
                     </div>
                   </div>
@@ -160,14 +173,14 @@ export default function Navbar() {
             <>
               <Link
                 href="/signin"
-                className="rounded-lg border border-stone-200 px-4 py-2 hover:bg-stone-50"
+                className="rounded-lg border border-stone-200 px-4 py-2 transition hover:bg-stone-50"
               >
                 সাইন ইন
               </Link>
 
               <Link
                 href="/signup"
-                className="rounded-lg bg-emerald-800 px-4 py-2 text-white hover:bg-emerald-900"
+                className="rounded-lg bg-emerald-800 px-4 py-2 text-white transition hover:bg-emerald-900"
               >
                 সাইন আপ
               </Link>
@@ -176,6 +189,7 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* Product categories */}
       <nav
         aria-label="পণ্যের বিভাগ"
         className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-4"
