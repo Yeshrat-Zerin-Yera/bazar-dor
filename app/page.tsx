@@ -1,10 +1,7 @@
 import ProductCard from "@/components/product-card";
 import { getProducts } from "@/lib/api";
 import type { Product } from "@/lib/types";
-import Navbar from "@/components/navbar";
-import PriceTicker from "@/components/price-ticker";
 import Hero from "@/components/hero";
-import Footer from "@/components/footer";
 
 export default async function HomePage() {
   let products: Product[] = [];

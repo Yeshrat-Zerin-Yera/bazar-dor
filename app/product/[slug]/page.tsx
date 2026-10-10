@@ -2,9 +2,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { headers } from "next/headers";
 
-import Navbar from "@/components/navbar";
-import PriceTicker from "@/components/price-ticker";
-
 import { auth } from "@/auth";
 
 import {

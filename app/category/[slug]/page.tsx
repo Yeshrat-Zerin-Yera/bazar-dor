@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Navbar from "@/components/navbar";
 import {
   getCategories,
   getProducts,
 } from "@/lib/api";
 import CategoryProducts from "@/components/category-products";
-import PriceTicker from "@/components/price-ticker";
 
 export default async function CategoryPage({
   params,
