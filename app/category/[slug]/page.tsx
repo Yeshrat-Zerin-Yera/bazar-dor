@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/navbar";
 import {
   getCategories,
-  getProductsByCategory,
   getProducts,
 } from "@/lib/api";
 import CategoryProducts from "@/components/category-products";
@@ -16,11 +15,13 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
 
-  const [categories, products, allProducts] = await Promise.all([
+  const [categories, allProducts] = await Promise.all([
     getCategories(),
-    getProductsByCategory(slug),
     getProducts(),
   ]);
+
+  console.log("Categories from API:", categories);
+  console.log("Requested category slug:", slug);
 
   const category = categories.find(
     (item) => item.slug === slug
@@ -30,11 +31,12 @@ export default async function CategoryPage({
     notFound();
   }
 
+  const products = allProducts.filter(
+    (product) => product.category === slug
+  );
+
   return (
     <main className="min-h-screen bg-[#fafaf7]">
-      <Navbar />
-      <PriceTicker products={allProducts} />
-
       <section className="mx-auto max-w-6xl px-4 py-10">
         <nav className="mb-6 text-sm text-stone-500">
           <Link href="/" className="hover:text-emerald-700">
@@ -61,8 +63,9 @@ export default async function CategoryPage({
             <p className="mt-2 text-stone-600">
               এই বিভাগের{" "}
               <span className="font-bold text-stone-900">
-              {products.length}
-              </span>{" "} টি পণ্যের আজকের বাজারদর
+                {products.length}
+              </span>{" "}
+              টি পণ্যের আজকের বাজারদর
             </p>
           </div>
         </div>

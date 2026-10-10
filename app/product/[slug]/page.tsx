@@ -1,9 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 import Navbar from "@/components/navbar";
 import PriceTicker from "@/components/price-ticker";
+
+import { auth } from "@/auth";
 
 import {
   getProduct,
@@ -19,12 +21,23 @@ import {
 export default async function ProductDetailsPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
+  const { slug } = await params;
+
+  // Check whether the user is signed in.
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect(
+      `/signin?callbackURL=${encodeURIComponent(`/product/${slug}`)}`
+    );
+  }
 
   const [product, allProducts] = await Promise.all([
-    getProduct(id),
+    getProduct(slug),
     getProducts(),
   ]);
 
@@ -82,12 +95,7 @@ export default async function ProductDetailsPage({
 
   return (
     <main className="min-h-screen bg-[#fafaf7] text-stone-900">
-      <Navbar />
-
-      <PriceTicker products={allProducts} />
-
       <div className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-        {/* Breadcrumb */}
         <nav className="mb-8 flex flex-wrap items-center gap-2 text-sm text-stone-500">
           <Link href="/" className="hover:text-emerald-700">
             হোম
@@ -109,7 +117,6 @@ export default async function ProductDetailsPage({
           </span>
         </nav>
 
-        {/* Product heading and today's price */}
         <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="flex flex-col justify-center">
             <div className="mb-4 flex items-center gap-3">
@@ -189,7 +196,6 @@ export default async function ProductDetailsPage({
           </div>
         </section>
 
-        {/* Market price summary */}
         <section className="mt-8">
           <h2 className="mb-4 text-xl font-bold">
             দামের সারসংক্ষেপ
@@ -244,7 +250,6 @@ export default async function ProductDetailsPage({
           </div>
         </section>
 
-        {/* Market-by-market prices */}
         <section className="mt-10">
           <h2 className="text-xl font-bold">
             বাজারভিত্তিক আজকের দাম
@@ -255,22 +260,14 @@ export default async function ProductDetailsPage({
               <table className="w-full min-w-[620px] text-left text-sm">
                 <thead className="bg-stone-50">
                   <tr className="border-b border-stone-200 text-stone-600">
-                    <th className="px-4 py-4 font-semibold">
-                      বাজার
-                    </th>
-
-                    <th className="px-4 py-4 font-semibold">
-                      বিভাগ
-                    </th>
-
+                    <th className="px-4 py-4 font-semibold">বাজার</th>
+                    <th className="px-4 py-4 font-semibold">বিভাগ</th>
                     <th className="px-4 py-4 text-right font-semibold">
                       সর্বনিম্ন
                     </th>
-
                     <th className="px-4 py-4 text-right font-semibold">
                       সর্বাধিক
                     </th>
-
                     <th className="px-4 py-4 text-right font-semibold">
                       গড়
                     </th>
@@ -290,19 +287,15 @@ export default async function ProductDetailsPage({
                         <td className="px-4 py-4 font-semibold text-stone-900">
                           {market.market}
                         </td>
-
                         <td className="px-4 py-4 text-stone-600">
                           {market.division}
                         </td>
-
                         <td className="px-4 py-4 text-right text-emerald-700">
                           {formatTaka(market.min)}
                         </td>
-
                         <td className="px-4 py-4 text-right text-stone-700">
                           {formatTaka(market.max)}
                         </td>
-
                         <td className="px-4 py-4 text-right font-semibold text-stone-900">
                           {formatTaka(marketAverage)}
                         </td>
@@ -319,7 +312,6 @@ export default async function ProductDetailsPage({
           )}
         </section>
 
-        {/* Historical prices */}
         <section className="mt-10">
           <h2 className="text-xl font-bold">
             আগের দামের তথ্য
@@ -327,10 +319,7 @@ export default async function ProductDetailsPage({
 
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-stone-200 bg-white p-5">
-              <p className="text-sm text-stone-500">
-                গতকালের দাম
-              </p>
-
+              <p className="text-sm text-stone-500">গতকালের দাম</p>
               <p className="mt-2 text-xl font-bold">
                 {formatTaka(product.yesterday)}
               </p>
@@ -340,7 +329,6 @@ export default async function ProductDetailsPage({
               <p className="text-sm text-stone-500">
                 গত সপ্তাহের দাম
               </p>
-
               <p className="mt-2 text-xl font-bold">
                 {formatTaka(product.lastWeek)}
               </p>
@@ -350,7 +338,6 @@ export default async function ProductDetailsPage({
               <p className="text-sm text-stone-500">
                 গত মাসের দাম
               </p>
-
               <p className="mt-2 text-xl font-bold">
                 {formatTaka(product.lastMonth)}
               </p>
@@ -358,31 +345,13 @@ export default async function ProductDetailsPage({
           </div>
         </section>
 
-<Link
-  href={`/category/${product.category}`}
-  className="mt-8 inline-flex rounded-xl bg-emerald-800 px-5 py-3 font-semibold text-white transition hover:bg-emerald-900"
->
-  ← সব {product.categoryNameBn} দেখুন
-</Link>
-
+        <Link
+          href={`/category/${product.category}`}
+          className="mt-8 inline-flex rounded-xl bg-emerald-800 px-5 py-3 font-semibold text-white transition hover:bg-emerald-900"
+        >
+          ← সব {product.categoryNameBn} দেখুন
+        </Link>
       </div>
-
-      {/* Footer */}
-      <footer className="mt-12 border-t border-stone-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-center">
-          <p className="font-bold text-emerald-800">
-            বাজার দর
-          </p>
-
-          <p className="mt-2 text-sm text-stone-600">
-            প্রয়োজনীয় পণ্যের দাম এক নজরে।
-          </p>
-
-          <p className="mt-3 text-xs text-stone-500">
-            সকল দাম সম্ভাব্য; বাজার অবস্থার ওপর নির্ভর করে পরিবর্তিত হয়।
-          </p>
-        </div>
-      </footer>
     </main>
   );
 }

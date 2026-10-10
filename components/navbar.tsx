@@ -12,7 +12,7 @@ const categories = [
   { slug: "chal", name: "চাল", icon: "🍚" },
   { slug: "dal", name: "ডাল", icon: "🫘" },
   { slug: "tel", name: "তেল", icon: "🛢️" },
-  { slug: "shobji", name: "সবজি", icon: "🥬" },
+  { slug: "sobji", name: "সবজি", icon: "🥬" },
   { slug: "mach", name: "মাছ", icon: "🐟" },
   { slug: "mangsho", name: "মাংস", icon: "🍗" },
   { slug: "dim-dudh", name: "ডিম-দুধ", icon: "🥛" },

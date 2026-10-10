@@ -10,9 +10,6 @@ export default async function SignUpPage() {
 
   return (
     <>
-      <Navbar />
-      <PriceTicker products={products} />
-
       <main className="min-h-[65vh] bg-gray-50 px-4 py-12">
         <section className="mx-auto max-w-md">
           <div className="mb-6 text-center">
@@ -39,8 +36,6 @@ export default async function SignUpPage() {
           </div>
         </section>
       </main>
-
-      <Footer/>
     </>
   );
 }

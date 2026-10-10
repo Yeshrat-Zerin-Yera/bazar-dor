@@ -6,45 +6,17 @@ import {
   UserRound,
   LogOut,
   Save,
-  TrendingUp,
-  TrendingDown,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
-import type { Product } from "@/lib/types";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
 
 export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
   const [saving, setSaving] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-
-    fetch("/api/products")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        return response.json();
-      })
-      .then((data: Product[]) => {
-        if (active) setProducts(data);
-      })
-      .catch((error) => {
-        console.error("Failed to fetch products:", error);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -114,59 +86,6 @@ export default function ProfilePage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#fafaf7]">
-      <Navbar />
-
-      {/* Moving product price ticker */}
-      <div className="w-full overflow-hidden border-y border-emerald-100 bg-white py-3">
-        {products.length > 0 ? (
-          <div className="ticker-track flex w-max items-center">
-            {[...products, ...products].map((product, index) => (
-              <div
-                key={`${product.id}-${index}`}
-                className="flex shrink-0 items-center gap-2 px-6 text-sm"
-              >
-                <span className="font-medium text-stone-700">
-                  {product.nameBn}
-                </span>
-
-                <span className="font-bold text-stone-900">
-                  ৳{product.today}
-                  <span className="ml-1 font-normal text-stone-500">
-                    /{product.unit}
-                  </span>
-                </span>
-
-                <span
-                  className={
-                    product.change.dir === "up"
-                      ? "flex items-center gap-1 font-semibold text-red-600"
-                      : product.change.dir === "down"
-                        ? "flex items-center gap-1 font-semibold text-emerald-700"
-                        : "font-semibold text-stone-500"
-                  }
-                >
-                  {product.change.dir === "up" ? (
-                    <TrendingUp size={14} />
-                  ) : product.change.dir === "down" ? (
-                    <TrendingDown size={14} />
-                  ) : null}
-
-                  {product.change.dir === "flat"
-                    ? "→"
-                    : `${product.change.pct > 0 ? "+" : ""}${product.change.pct}%`}
-                </span>
-
-                <span className="ml-2 text-stone-300">•</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-sm text-stone-500">
-            বাজারদরের তথ্য লোড হচ্ছে...
-          </p>
-        )}
-      </div>
-
       <main className="flex-1 px-4 py-10 sm:py-14">
         {isPending || !session ? (
           <div className="flex min-h-[40vh] items-center justify-center">
@@ -266,40 +185,15 @@ export default function ProfilePage() {
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 px-5 py-3 font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
                 >
                   <LogOut size={18} />
-                  {signingOut ? "সাইন আউট হচ্ছে..." : "সাইন আউট"}
+                  {signingOut
+                    ? "সাইন আউট হচ্ছে..."
+                    : "সাইন আউট"}
                 </button>
               </div>
             </div>
           </section>
         )}
       </main>
-
-      <Footer />
-
-      <style jsx>{`
-        .ticker-track {
-          animation: ticker-scroll 35s linear infinite;
-        }
-
-        .ticker-track:hover {
-          animation-play-state: paused;
-        }
-
-        @keyframes ticker-scroll {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ticker-track {
-            animation: none;
-          }
-        }
-      `}</style>
     </div>
   );
 }

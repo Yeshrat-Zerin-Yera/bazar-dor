@@ -27,8 +27,6 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-[#fafaf7] text-stone-900">
-      <Navbar />
-      <PriceTicker products={products} />
       <Hero />
 
       <div className="mx-auto max-w-6xl space-y-14 px-4 pb-16">
@@ -72,8 +70,6 @@ export default async function HomePage() {
           )}
         </section>
       </div>
-
-      <Footer/>
     </main>
   );
 }

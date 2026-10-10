@@ -16,9 +16,6 @@ export default async function SigninPage() {
 
   return (
     <>
-      <Navbar />
-      <PriceTicker products={products} />
-
       <main className="min-h-[65vh] bg-[#fafaf7] px-4 py-12">
         <section className="mx-auto max-w-md">
           <div className="mb-6 text-center">

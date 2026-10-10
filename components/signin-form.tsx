@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SigninForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const callbackURL = searchParams.get("callbackURL");
+  const redirectTo =
+    callbackURL?.startsWith("/") && !callbackURL.startsWith("//")
+      ? callbackURL
+      : "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +39,7 @@ export default function SigninForm() {
       }
 
       toast.success("সফলভাবে সাইন ইন হয়েছে!");
-      router.push("/");
+      router.push(redirectTo);
       router.refresh();
     } catch {
       toast.error("কিছু সমস্যা হয়েছে। আবার চেষ্টা করুন।");
@@ -49,11 +56,13 @@ export default function SigninForm() {
     try {
       const result = await authClient.signIn.social({
         provider,
-        callbackURL: "/",
+        callbackURL: redirectTo,
       });
 
       if (result.error) {
-        toast.error(result.error.message || "সোশ্যাল সাইন ইন ব্যর্থ হয়েছে");
+        toast.error(
+          result.error.message || "সোশ্যাল সাইন ইন ব্যর্থ হয়েছে"
+        );
         setSocialLoading(false);
       }
     } catch {
