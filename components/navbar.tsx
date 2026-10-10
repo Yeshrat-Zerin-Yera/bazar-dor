@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -64,15 +63,8 @@ export default function Navbar() {
           className="flex shrink-0 items-center gap-3"
           aria-label="বাজার দর হোম পেজ"
         >
-          <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-800 p-1.5">
-            <Image
-              src="/logo-icon.png"
-              alt="বাজার দর লোগো"
-              width={48}
-              height={48}
-              className="h-full w-full object-contain"
-              priority
-            />
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-emerald-800 text-3xl">
+            🛒
           </span>
 
           <span className="min-w-0">
