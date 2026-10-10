@@ -54,10 +54,10 @@ export default function PriceTicker({
                 }
               >
                 {direction === "up"
-                  ? "↑"
+                  ? "▲"
                   : direction === "down"
-                    ? "↓"
-                    : "→"}{" "}
+                    ? "▼"
+                    : "_"}{" "}
                 {new Intl.NumberFormat("bn-BD", {
                   maximumFractionDigits: 1,
                 }).format(product.change.pct)}
