@@ -1,37 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛒 Bazar Dor (বাজার দর)
 
-## Getting Started
+**Your Daily Market Prices, Made Simple.**
 
-First, run the development server:
+## 📌 Description
+
+Bazar Dor is a web application that helps people in Bangladesh explore the prices of everyday market products in one place. Users can browse products, compare prices, track price changes, and access market information through a simple, responsive Bengali interface.
+
+## ✨ Features
+
+- **Daily Market Prices:** View available prices of essential market products.
+- **Product Categories:** Browse rice, lentils, oil, vegetables, fish, meat, eggs, milk, and spices.
+- **Price Change Indicators:** Identify price increases, decreases, and unchanged prices.
+- **Product Details:** View individual product information and pricing.
+- **Search and Sorting:** Find products and sort them by price.
+- **User Authentication:** Register and sign in using email and password.
+- **Social Authentication:** Google and GitHub sign-in through Better Auth.
+- **Responsive Design:** Works across desktop, tablet, and mobile devices.
+- **Bengali Interface:** Provides Bengali text for a familiar local experience.
+- **Price Ticker:** Displays product prices and price changes in a scrolling ticker.
+- **Toast Notifications:** Shows feedback for user actions and authentication events.
+
+## 🛠️ Technologies Used
+
+- **Next.js 16** — React framework and App Router
+- **React** — UI development
+- **TypeScript** — Type safety
+- **Tailwind CSS** — Responsive styling
+- **Better Auth** — Authentication
+- **Prisma ORM** — Database access
+- **Neon PostgreSQL** — Cloud database
+- **Lucide React** — Icons
+- **React Hot Toast** — Notifications
+- **Programming Hero API** — Product and market price data
+- **Vercel** — Deployment and hosting
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+- Git
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Yeshrat-Zerin-Yera/bazar-dor.git
+```
+
+### 2. Enter the project directory
+
+```bash
+cd bazar-dor
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env` file in the project root and add the environment variables required by your application.
+
+For example:
+
+```env
+DATABASE_URL="your-neon-database-url"
+BETTER_AUTH_SECRET="your-auth-secret"
+BETTER_AUTH_URL="http://localhost:3000"
+
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+```
+
+Use your actual credentials and any additional variables required by your project. Never commit secrets to GitHub.
+
+### 5. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 6. Build for production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+## 🌐 Live Demo
 
-To learn more about Next.js, take a look at the following resources:
+**Live Website:** https://bazar-dor-xbp8.vercel.app
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📂 Repository
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+[View Bazar Dor on GitHub](https://github.com/Yeshrat-Zerin-Yera/bazar-dor)
 
-## Deploy on Vercel
+## 🔐 Security
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Store credentials and secrets in environment variables.
+- Never expose database URLs or authentication secrets in client-side code.
+- Configure OAuth callback URLs for the correct deployment domain.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# bazar-dor" 
+## 📄 License
+
+This project is currently provided for educational and personal portfolio purposes. Add a formal open-source license if you intend to distribute it under specific reuse terms.
+
+---
+
+**Bazar Dor — বাজারদর জানুন, সচেতনভাবে বাজার করুন।**
