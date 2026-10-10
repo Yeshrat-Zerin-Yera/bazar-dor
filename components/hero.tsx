@@ -1,13 +1,36 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    setDate(
+      new Intl.DateTimeFormat("bn-BD", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "Asia/Dhaka",
+      }).format(new Date())
+    );
+  }, []);
+
   return (
     <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:py-16 md:grid-cols-2 md:py-20">
       <div>
-        <p className="mb-4 inline-flex rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
+        <p className="mb-2 inline-flex rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800">
           আপনার প্রতিদিনের বাজার, এখন আরও সহজ
         </p>
+
+        {date && (
+          <p className="mb-4 text-sm font-medium text-stone-500">
+            {date}
+          </p>
+        )}
 
         <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-stone-900 sm:text-5xl lg:text-6xl">
           আজকের বাজারের দাম
