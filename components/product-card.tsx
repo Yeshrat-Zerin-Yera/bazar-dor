@@ -9,9 +9,9 @@ export default function ProductCard({
 }) {
   const changeColor =
     product.change.dir === "up"
-      ? "text-emerald-700 bg-emerald-50"
+      ? "text-red-700 bg-red-50"
       : product.change.dir === "down"
-        ? "text-red-700 bg-red-50"
+        ? "text-emerald-700 bg-emerald-50"
         : "text-gray-600 bg-gray-100";
 
   const changeLabel =
