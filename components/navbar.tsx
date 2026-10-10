@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { UserRound, LogOut, ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
@@ -22,7 +22,9 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const [profileOpen, setProfileOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+
   const router = useRouter();
+  const pathname = usePathname();
 
   const banglaDate = new Intl.DateTimeFormat("bn-BD", {
     weekday: "long",
@@ -56,13 +58,14 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200 bg-white">
+      {/* Brand and account controls */}
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:py-5">
-        {/* Logo and website name */}
         <Link
           href="/"
           className="flex shrink-0 items-center gap-3"
           aria-label="বাজার দর হোম পেজ"
         >
+          {/* Shopping cart logo */}
           <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-emerald-800 text-3xl">
             🛒
           </span>
@@ -186,15 +189,25 @@ export default function Navbar() {
         aria-label="পণ্যের বিভাগ"
         className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pb-4"
       >
-        {categories.map((category) => (
-          <Link
-            key={category.slug}
-            href={`/category/${category.slug}`}
-            className="shrink-0 rounded-full px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-emerald-50 hover:text-emerald-900"
-          >
-            {category.icon} {category.name}
-          </Link>
-        ))}
+        {categories.map((category) => {
+          const isActive =
+            pathname === `/category/${category.slug}`;
+
+          return (
+            <Link
+              key={category.slug}
+              href={`/category/${category.slug}`}
+              aria-current={isActive ? "page" : undefined}
+              className={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition ${
+                isActive
+                  ? "bg-emerald-800 text-white"
+                  : "text-stone-600 hover:bg-emerald-50 hover:text-emerald-900"
+              }`}
+            >
+              {category.icon} {category.name}
+            </Link>
+          );
+        })}
       </nav>
     </header>
   );
