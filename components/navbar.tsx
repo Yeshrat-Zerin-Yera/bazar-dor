@@ -14,7 +14,7 @@ const categories = [
   { slug: "sobji", name: "সবজি", icon: "🥬" },
   { slug: "mach", name: "মাছ", icon: "🐟" },
   { slug: "mangsho", name: "মাংস", icon: "🍗" },
-  { slug: "dim-dudh", name: "ডিম-দুধ", icon: "🥛" },
+  { slug: "dim-dui", name: "ডিম-দুধ", icon: "🥛" },
   { slug: "moshla", name: "মসলা", icon: "🌶️" },
 ];
 
