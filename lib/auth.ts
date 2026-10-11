@@ -22,10 +22,20 @@ export const auth = betterAuth({
 
   baseURL,
 
-  trustedOrigins: ["http://localhost:3000", baseURL],
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://bazar-dor-xbp8.vercel.app",
+  ],
 
   emailAndPassword: {
     enabled: true,
+  },
+
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+    },
   },
 
   socialProviders: {
