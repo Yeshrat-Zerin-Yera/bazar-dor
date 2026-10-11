@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { GitBranch } from "lucide-react";
 import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
@@ -16,7 +14,9 @@ export default function SignupForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [socialLoading, setSocialLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<
+    "google" | "github" | null
+  >(null);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
@@ -37,8 +37,8 @@ export default function SignupForm() {
 
     try {
       const result = await authClient.signUp.email({
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         password,
       });
 
@@ -50,6 +50,7 @@ export default function SignupForm() {
       }
 
       toast.success("অ্যাকাউন্ট তৈরি হয়েছে!");
+
       router.push("/");
       router.refresh();
     } catch {
@@ -62,7 +63,7 @@ export default function SignupForm() {
   async function handleSocialSignUp(
     provider: "google" | "github"
   ) {
-    setSocialLoading(true);
+    setSocialLoading(provider);
 
     try {
       const result = await authClient.signIn.social({
@@ -74,11 +75,11 @@ export default function SignupForm() {
         toast.error(
           result.error.message || "সোশ্যাল সাইন আপ ব্যর্থ হয়েছে"
         );
-        setSocialLoading(false);
+        setSocialLoading(null);
       }
     } catch {
       toast.error("কিছু সমস্যা হয়েছে। আবার চেষ্টা করুন।");
-      setSocialLoading(false);
+      setSocialLoading(null);
     }
   }
 
@@ -87,6 +88,8 @@ export default function SignupForm() {
 
   const socialButtonClass =
     "flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 font-medium text-gray-800 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60";
+
+  const isBusy = loading || socialLoading !== null;
 
   return (
     <>
@@ -98,6 +101,7 @@ export default function SignupForm() {
           >
             নাম
           </label>
+
           <input
             id="name"
             type="text"
@@ -117,6 +121,7 @@ export default function SignupForm() {
           >
             ইমেইল
           </label>
+
           <input
             id="email"
             type="email"
@@ -136,6 +141,7 @@ export default function SignupForm() {
           >
             পাসওয়ার্ড
           </label>
+
           <input
             id="password"
             type="password"
@@ -156,6 +162,7 @@ export default function SignupForm() {
           >
             পাসওয়ার্ড নিশ্চিত করুন
           </label>
+
           <input
             id="confirmPassword"
             type="password"
@@ -165,6 +172,7 @@ export default function SignupForm() {
               setConfirmPassword(event.target.value)
             }
             autoComplete="new-password"
+            minLength={8}
             required
             className={inputClass}
           />
@@ -172,44 +180,84 @@ export default function SignupForm() {
 
         <button
           type="submit"
-          disabled={loading || socialLoading}
+          disabled={isBusy}
           className="w-full rounded-lg bg-emerald-800 px-4 py-3 font-semibold text-white transition hover:bg-emerald-900 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "অ্যাকাউন্ট তৈরি করুন"}
+          {loading
+            ? "অ্যাকাউন্ট তৈরি হচ্ছে..."
+            : "অ্যাকাউন্ট তৈরি করুন"}
         </button>
       </form>
 
       <div className="my-6 flex items-center gap-4">
         <div className="h-px flex-1 bg-gray-200" />
+
         <span className="text-sm text-gray-500">অথবা</span>
+
         <div className="h-px flex-1 bg-gray-200" />
       </div>
 
       <div className="space-y-3">
+        {/* Google sign-up */}
         <button
           type="button"
           onClick={() => handleSocialSignUp("google")}
-          disabled={loading || socialLoading}
+          disabled={isBusy}
           className={socialButtonClass}
         >
-          <Image
-            src="/google.svg"
-            alt="Google"
-            width={20}
-            height={20}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 48 48"
+            width="20"
+            height="20"
+            aria-hidden="true"
             className="shrink-0"
-          />
-          {socialLoading ? "অপেক্ষা করুন..." : "Google দিয়ে চালিয়ে যান"}
+          >
+            <path
+              fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+            />
+            <path
+              fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.76 7.18l7.73 6C44.42 37.96 46.98 31.8 46.98 24.55Z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z"
+            />
+            <path
+              fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.92 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+            />
+          </svg>
+
+          {socialLoading === "google"
+            ? "Google-এ নিয়ে যাওয়া হচ্ছে..."
+            : "Google দিয়ে চালিয়ে যান"}
         </button>
 
+        {/* GitHub sign-up */}
         <button
           type="button"
           onClick={() => handleSocialSignUp("github")}
-          disabled={loading || socialLoading}
+          disabled={isBusy}
           className={socialButtonClass}
         >
-          <GitBranch size={20} />
-          {socialLoading ? "অপেক্ষা করুন..." : "GitHub দিয়ে চালিয়ে যান"}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="currentColor"
+            aria-hidden="true"
+            className="shrink-0"
+          >
+            <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.54v-2.13c-3.1.68-3.76-1.31-3.76-1.31-.5-1.28-1.23-1.62-1.23-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.59 1.21 3.22.92.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.53 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.06 1.15a10.63 10.63 0 0 1 5.57 0c2.12-1.44 3.05-1.15 3.05-1.15.61 1.54.23 2.68.12 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.62 5.25-5.11 5.52.4.35.75 1.03.75 2.08v3.09c0 .3.2.65.76.54A11.1 11.1 0 0 0 12 .9Z" />
+          </svg>
+
+          {socialLoading === "github"
+            ? "GitHub-এ নিয়ে যাওয়া হচ্ছে..."
+            : "GitHub দিয়ে চালিয়ে যান"}
         </button>
       </div>
 
