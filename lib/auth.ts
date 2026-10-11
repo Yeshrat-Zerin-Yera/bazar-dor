@@ -32,11 +32,12 @@ export const auth = betterAuth({
   },
 
   account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google"],
-    },
+  accountLinking: {
+    enabled: true,
+    trustedProviders: ["google"],
+    requireLocalEmailVerified: false,
   },
+},
 
   socialProviders: {
     google: {
